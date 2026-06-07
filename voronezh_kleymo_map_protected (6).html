@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Карта клейм Воронежа | «В стороне от..»</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 90vh; width: 100%; }
+        #legend { 
+            padding: 12px; 
+            background: #f8f9fa; 
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+        .color-box { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #333; }
+        h2 { margin: 0 12px 0 0; font-size: 14px; }
+        .legend-group-link { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; margin: 0 8px; }
+        .legend-group-link a { color: #2a5885; text-decoration: none; }
+        .legend-group-link a:hover { text-decoration: underline; color: #1a3a6b; }
+        /* Защита от копирования */
+        body, img {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        img {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            pointer-events: none;
+        }
+        .watermark {
+            position: fixed;
+            bottom: 42px;
+            right: 15px;
+            z-index: 1001;
+            opacity: 0.9;
+            font-size: 15px;
+            color: #222;
+            background: rgba(255,255,255,0.95);
+            padding: 10px 16px;
+            border-radius: 6px;
+            pointer-events: none;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .watermark a {
+            color: #2a5885;
+            text-decoration: none;
+            pointer-events: auto;
+            font-size: 16px;
+        }
+        .watermark a:hover {
+            text-decoration: underline;
+            color: #1a3a6b;
+        }
+        .copyright-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(30,30,30,0.92);
+            color: #ccc;
+            font-size: 12px;
+            padding: 6px 15px;
+            text-align: center;
+            pointer-events: none;
+            height: 32px;
+            line-height: 20px;
+            box-sizing: border-box;
+        }
+        .copyright-bar a {
+            color: #6a9fd4;
+            text-decoration: none;
+            pointer-events: auto;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .copyright-bar a:hover {
+            text-decoration: underline;
+            color: #8ab8e8;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false">
+    <div id="legend">
+        <h2>Карта клейм на кирпичах Воронежа</h2>
+        <div class="legend-item"><div class="color-box" style="background:red"></div>АА</div>
+        <div class="legend-item"><div class="color-box" style="background:blue"></div>ТГ</div>
+        <div class="legend-item"><div class="color-box" style="background:green"></div>ГСНХ</div>
+        <div class="legend-item"><div class="color-box" style="background:purple"></div>ВКЗН8</div>
+        <div class="legend-item"><div class="color-box" style="background:orange"></div>ВК</div>
+        <div class="legend-item"><div class="color-box" style="background:navy"></div>ВКЗ</div>
+        <div class="legend-item"><div class="color-box" style="background:darkred"></div>ЯК</div>
+        <div class="legend-item"><div class="color-box" style="background:darkblue"></div>НК</div>
+        <div class="legend-item"><div class="color-box" style="background:cadetblue"></div>ВСК</div>
+        <div class="legend-item"><div class="color-box" style="background:crimson"></div>ФИК</div>
+        <div class="legend-item"><div class="color-box" style="background:darkpurple"></div>АГ</div>
+        <div class="legend-item"><div class="color-box" style="background:indigo"></div>АК</div>
+        <div class="legend-item"><div class="color-box" style="background:teal"></div>ИС</div>
+        <div class="legend-item"><div class="color-box" style="background:black"></div>3 ЗТК</div>
+        <div class="legend-group-link"><a href="https://vk.com/vstopone" target="_blank">Группа ВКонтакте "В стороне от.."</a></div>
+        <div class="legend-item"><div class="color-box" style="background:gold"></div>ХЛЫСТОВ</div>
+        <div class="legend-item"><div class="color-box" style="background:tomato"></div>Я.К.</div>
+        <div class="legend-item"><div class="color-box" style="background:mediumslateblue"></div>Н.К.</div>
+        <div class="legend-item"><div class="color-box" style="background:darkkhaki"></div>НД</div>
+        <div class="legend-item"><div class="color-box" style="background:mediumvioletred"></div>МА</div>
+        <div class="legend-item"><div class="color-box" style="background:sienna"></div>ИГ</div>
+        <div class="legend-item"><div class="color-box" style="background:coral"></div>ИА</div>
+        <div class="legend-item"><div class="color-box" style="background:darkolivegreen"></div>З.Г.</div>
+        <div class="legend-item"><div class="color-box" style="background:lightgray"></div>прочие/н/д</div>
+    </div>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map', { attributionControl: false }).setView([51.6720, 39.1843], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        L.circleMarker([51.674231, 39.176700], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Воронеж</b><br>Клеймо: <b>ТГ</b><br>апсида Казанской церкви<br><i></i>');
+
+        L.circleMarker([51.668400, 39.179871], {
+            color: 'gold',
+            fillColor: 'gold',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Воронеж</b><br>Клеймо: <b>ХЛЫСТОВ БАРИС 1937</b><br>старая водонапорная башня<br><i>Верх поврежден в 1942-43, восстановлен. Низ со следами пуль и осколков.</i>');
+
+        L.circleMarker([51.675784, 39.187127], {
+            color: 'lightred',
+            fillColor: 'lightred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Воронеж</b><br>Клеймо: <b>ЯЖ(ЯН)</b><br>бывшая Печерская церковь Покровского девичьего монастыря<br><i></i>');
+
+        L.circleMarker([51.678275, 39.177691], {
+            color: 'salmon',
+            fillColor: 'salmon',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Воронеж (близ \'красного корпуса ВГУ\')</b><br>Клеймо: <b>ША?</b><br>раскоп<br><i>Требует уточнения</i>');
+
+        L.circleMarker([51.693751, 39.022477], {
+            color: 'brown',
+            fillColor: 'brown',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Семилукский район, с. Ливенка</b><br>Клеймо: <b>Чертов</b><br>полуразвалившийся дом<br><i>Имя и отчество не помнятся</i>');
+
+        L.circleMarker([51.760498, 39.370086], {
+            color: 'black',
+            fillColor: 'black',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Сомово</b><br>Клеймо: <b>3 ЗТК</b><br>электрическая подстанция<br><i>Несколько таких подстанций. Дата выпуска и строительства неизвестны.</i>');
+
+        L.circleMarker([51.664425, 39.179481], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Маломосковский, 9</b><br>Клеймо: <b>ГСНХ</b><br>главный фасад здания<br><i></i>');
+
+        L.circleMarker([51.674398, 39.185019], {
+            color: 'darkred',
+            fillColor: 'darkred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Мельничный, 1</b><br>Клеймо: <b>ЯК</b><br>остатки ограды<br><i></i>');
+
+        L.circleMarker([51.667527, 39.185728], {
+            color: 'teal',
+            fillColor: 'teal',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Мельничный, 24</b><br>Клеймо: <b>ИС</b><br>здание недалеко от дома<br><i>Возможные варианты: Иван Михайлович Соколов или Ирина Санина</i>');
+
+        L.circleMarker([51.676951, 39.176404], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Солдатский</b><br>Клеймо: <b>ВК</b><br>стена<br><i></i>');
+
+        L.circleMarker([51.676893, 39.187470], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Солдатский, 16</b><br>Клеймо: <b>Т.Г.i</b><br><br><i></i>');
+
+        L.circleMarker([51.669444, 39.178788], {
+            color: 'darkpurple',
+            fillColor: 'darkpurple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный</b><br>Клеймо: <b>АГ</b><br>стена возле Тихвино-Онуфриевского храма<br><i>Кирпичное производство в слободе Чижовке. Хорошо видны точки между буквами А и Г</i>');
+
+        L.circleMarker([51.679315, 39.181686], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный</b><br>Клеймо: <b>ВК</b><br>стена, примыкающая к Тихвино-Онуфриевскому храму<br><i></i>');
+
+        L.circleMarker([51.665484, 39.177847], {
+            color: 'darkpurple',
+            fillColor: 'darkpurple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>АГ</b><br>стена в районе бывшей усадьбы Гарденина<br><i>Кирпичное производство в слободе Чижовке. Несколько кирпичей разной степени сохранности</i>');
+
+        L.circleMarker([51.677560, 39.185960], {
+            color: 'darkgreen',
+            fillColor: 'darkgreen',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>ИФТ</b><br>подвал<br><i>Ранее читалось как ШФИ (кверху ногами). Завод в Троицкой слободе, 1888г.</i>');
+
+        L.circleMarker([51.676914, 39.187976], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>н/д</b><br>Богоявленская церковь (трапезная)<br><i>Старинный кирпич: 29-30×14-15×5,6-6,6 см (из статьи Попова/Митина)</i>');
+
+        L.circleMarker([51.672580, 39.191870], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>н/д</b><br>хозяйственное здание во дворе<br><i>Клейма не указаны</i>');
+
+        L.circleMarker([51.670057, 39.185133], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>н/д</b><br>подвал Дома музея им. Дурова<br><i>Клейма не указаны</i>');
+
+        L.circleMarker([51.677270, 39.186196], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>н/д</b><br>подвал музея им. Крамского (мастерская рам)<br><i>Клеймо не указано (фото недоступно)</i>');
+
+        L.circleMarker([51.677787, 39.185538], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 24</b><br>Клеймо: <b>ВК</b><br>\'красный\' корпус ВГУ<br><i></i>');
+
+        L.circleMarker([51.675273, 39.177033], {
+            color: 'teal',
+            fillColor: 'teal',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 24</b><br>Клеймо: <b>ИС</b><br>\'красный\' корпус ВГУ<br><i>Возможные варианты: Иван Михайлович Соколов или Ирина Санина</i>');
+
+        L.circleMarker([51.667646, 39.180930], {
+            color: 'crimson',
+            fillColor: 'crimson',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 24</b><br>Клеймо: <b>ФИК</b><br>\'красный\' корпус ВГУ, со двора<br><i>Завод с 1875 года в Ямской слободе. С 1905 года сын Михаил Федорович Кожевников с клеймом МК</i>');
+
+        L.circleMarker([51.665277, 39.180025], {
+            color: 'gray',
+            fillColor: 'gray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Труда, 23/25</b><br>Клеймо: <b>КХ 1</b><br>полуразрушенное здание во дворе<br><i>Облюбовано бомжами</i>');
+
+        L.circleMarker([51.665616, 39.180748], {
+            color: 'gray',
+            fillColor: 'gray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Труда, 23/25</b><br>Клеймо: <b>КХ 2</b><br>полуразрушенное здание во дворе<br><i>Облюбовано бомжами</i>');
+
+        L.circleMarker([51.552171, 39.097837], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>с. Никольское-на-Еманче</b><br>Клеймо: <b>н/д</b><br>церковь<br><i>Клеймо не указано</i>');
+
+        L.circleMarker([51.617923, 39.245352], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>с. Углянец</b><br>Клеймо: <b>н/д</b><br>старый сарайчик в одном из дворов<br><i>Клейма не указаны</i>');
+
+        L.circleMarker([51.668272, 39.191286], {
+            color: 'beige',
+            fillColor: 'beige',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 20 лет ВЛКСМ, 12</b><br>Клеймо: <b>ФК</b><br><br><i>Более позднее клеймо, чем ФИК (с фитой)</i>');
+
+        L.circleMarker([51.674369, 39.186046], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 20 лет ВЛКСМ, 37а</b><br>Клеймо: <b>ВКЗН8</b><br>остатки стены возле дома<br><i></i>');
+
+        L.circleMarker([51.666738, 39.187966], {
+            color: 'teal',
+            fillColor: 'teal',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 20 лет ВЛКСМ, 40</b><br>Клеймо: <b>ИС</b><br>Дом В.И. Снопова<br><i>Возможные варианты: Иван Михайлович Соколов или Ирина Санина</i>');
+
+        L.circleMarker([51.666614, 39.182371], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 25 Октября</b><br>Клеймо: <b>Ю</b><br><br><i></i>');
+
+        L.circleMarker([51.679832, 39.186540], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 25 Октября, 22</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.672911, 39.187254], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Батуринская, 26</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.677486, 39.188716], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Батуринская, 27</b><br>Клеймо: <b>ТГi</b><br><br><i></i>');
+
+        L.circleMarker([51.667665, 39.176814], {
+            color: 'lightblue',
+            fillColor: 'lightblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Батуринская, 30</b><br>Клеймо: <b>БС</b><br><br><i></i>');
+
+        L.circleMarker([51.669047, 39.180584], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Батуринская, 34</b><br>Клеймо: <b>ВКЗН8</b><br>дом архитектора Баранова<br><i></i>');
+
+        L.circleMarker([51.667376, 39.191387], {
+            color: 'crimson',
+            fillColor: 'crimson',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Батуринская, 34/34а</b><br>Клеймо: <b>ФИК</b><br><br><i>Завод с 1875 года в Ямской слободе. С 1905 года сын Михаил Федорович Кожевников с клеймом МК</i>');
+
+        L.circleMarker([51.678022, 39.181335], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Батуринская, 34а</b><br>Клеймо: <b>ВКЗН8</b><br><br><i></i>');
+
+        L.circleMarker([51.674487, 39.182630], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Вайцеховского</b><br>Клеймо: <b>ВК</b><br>главный дом усадьбы Вигеля<br><i></i>');
+
+        L.circleMarker([51.678633, 39.183642], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Вайцеховского</b><br>Клеймо: <b>ВКЗН8</b><br>Дом Вигеля (во дворе)<br><i>По контексту — такие же клейма на Таранченко и Батуринской</i>');
+
+        L.circleMarker([51.668238, 39.180246], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Вайцеховского, 6</b><br>Клеймо: <b>АА</b><br>забор близ дома<br><i></i>');
+
+        L.circleMarker([51.672982, 39.180504], {
+            color: 'indigo',
+            fillColor: 'indigo',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Демократии, 9</b><br>Клеймо: <b>АК</b><br>стена сарая<br><i>Возможные варианты: Андрей Константинович Кузьмин (завод 1874, г. Задонск) или Анастасия Семеновна Колпачева</i>');
+
+        L.circleMarker([51.673353, 39.190665], {
+            color: 'darkpurple',
+            fillColor: 'darkpurple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Замкина</b><br>Клеймо: <b>АГ</b><br>стена около дома по Фабричному, 10<br><i>Кирпичное производство в слободе Чижовке</i>');
+
+        L.circleMarker([51.670390, 39.179809], {
+            color: 'lightpurple',
+            fillColor: 'lightpurple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Замкина</b><br>Клеймо: <b>Г</b><br>стена около дома по Фабричному, 10<br><i></i>');
+
+        L.circleMarker([51.679961, 39.184452], {
+            color: 'lightorange',
+            fillColor: 'lightorange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Замкина</b><br>Клеймо: <b>НД</b><br>стена около дома по Фабричному, 10<br><i></i>');
+
+        L.circleMarker([51.665455, 39.177054], {
+            color: 'lightgreen',
+            fillColor: 'lightgreen',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. К. Маркса, 67</b><br>Клеймо: <b>ВТОИ?</b><br>бывший завод Столля<br><i>Требует уточнения</i>');
+
+        L.circleMarker([51.665754, 39.186339], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Кольцовская, 11</b><br>Клеймо: <b>ТГ</b><br><br><i></i>');
+
+        L.circleMarker([51.676673, 39.183055], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Кольцовская, 2</b><br>Клеймо: <b>ТГi</b><br>во дворе, со стороны бывшего трамвайного кольца<br><i></i>');
+
+        L.circleMarker([51.665016, 39.182406], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Комиссаржевской, 15-а</b><br>Клеймо: <b>ГСНХ</b><br><br><i></i>');
+
+        L.circleMarker([51.679938, 39.184766], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Коммунаров, 27</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.679537, 39.190072], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Коммунаров, 40</b><br>Клеймо: <b>ТГi</b><br><br><i></i>');
+
+        L.circleMarker([51.664184, 39.187832], {
+            color: 'navy',
+            fillColor: 'navy',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Коммунаров, 47</b><br>Клеймо: <b>ВКЗ</b><br><br><i></i>');
+
+        L.circleMarker([51.674907, 39.184892], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Краснознаменная, 105</b><br>Клеймо: <b>ВКЗН8</b><br>торцевой фасад<br><i></i>');
+
+        L.circleMarker([51.668269, 39.186555], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ленина, 86-а</b><br>Клеймо: <b>н/д</b><br>Дача Вяхиревой<br><i>Клеймо не указано</i>');
+
+        L.circleMarker([51.665785, 39.183256], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ленина, 96</b><br>Клеймо: <b>АА</b><br><br><i></i>');
+
+        L.circleMarker([51.671260, 39.191561], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ломоносова, 114</b><br>Клеймо: <b>н/д</b><br>магазин Магнит (нижний пристроенный этаж)<br><i>Клеймо не указано в тексте</i>');
+
+        L.circleMarker([51.678014, 39.180514], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Мало-Терновая, 16</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.672009, 39.179158], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Орджоникидзе, 18</b><br>Клеймо: <b>цифры</b><br>дворовый фасад<br><i>Возможно, номер партии; не клеймо в классическом смысле</i>');
+
+        L.circleMarker([51.678602, 39.190228], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Орджоникидзе, 2/4</b><br>Клеймо: <b>ГСНХ</b><br>стена за калиткой<br><i></i>');
+
+        L.circleMarker([51.668775, 39.186523], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пролетарская, 4 А</b><br>Клеймо: <b>АА</b><br><br><i></i>');
+
+        L.circleMarker([51.673744, 39.178745], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пушкинская, 16</b><br>Клеймо: <b>ТГ</b><br><br><i></i>');
+
+        L.circleMarker([51.676200, 39.184930], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пушкинская, 20</b><br>Клеймо: <b>н/д</b><br>стена забора дома<br><i>Клеймо не указано</i>');
+
+        L.circleMarker([51.676458, 39.184786], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 42</b><br>Клеймо: <b>ВК</b><br>флигель усадьбы купца В.И. Халтурина<br><i></i>');
+
+        L.circleMarker([51.664009, 39.181486], {
+            color: 'cadetblue',
+            fillColor: 'cadetblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 42</b><br>Клеймо: <b>ВСК</b><br>Дом \'Гармошка\'<br><i>Отдельный объект</i>');
+
+        L.circleMarker([51.664312, 39.191166], {
+            color: 'darkred',
+            fillColor: 'darkred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 42</b><br>Клеймо: <b>ЯК</b><br>главный дом усадьбы купца В.И. Халтурина<br><i></i>');
+
+        L.circleMarker([51.678060, 39.189607], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 42а</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.668920, 39.177227], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 54</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.678048, 39.191451], {
+            color: 'darkpurple',
+            fillColor: 'darkpurple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 69</b><br>Клеймо: <b>АГ</b><br>внешняя стена бывшей усадьбы Глущенко со стороны ул. Пятницкого<br><i>Кирпичное производство в слободе Чижовке</i>');
+
+        L.circleMarker([51.665370, 39.184076], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 69</b><br>Клеймо: <b>н/д</b><br>стена, разделяющая двор с домами 48, 50 по ул. 25 Октября<br><i>Клейма не указаны</i>');
+
+        L.circleMarker([51.665107, 39.188470], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 36</b><br>Клеймо: <b>Т.Г.i</b><br>стена возле сарая<br><i></i>');
+
+        L.circleMarker([51.676253, 39.178354], {
+            color: 'crimson',
+            fillColor: 'crimson',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 55а</b><br>Клеймо: <b>ФИК</b><br>стена возле дома<br><i>Завод с 1875 года в Ямской слободе. С 1905 года сын Михаил Федорович Кожевников с клеймом МК</i>');
+
+        L.circleMarker([51.671605, 39.185097], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. С. Разина, 53</b><br>Клеймо: <b>н/д</b><br><br><i>Клеймо не указано</i>');
+
+        L.circleMarker([51.668241, 39.190259], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти</b><br>Клеймо: <b>А.А.</b><br>напротив школы №40 (пересечение с Батуринской), остаток стены<br><i>Рядом мусорка</i>');
+
+        L.circleMarker([51.670770, 39.179689], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти</b><br>Клеймо: <b>ТГ</b><br>забор около \'Дома кантонистов\'<br><i></i>');
+
+        L.circleMarker([51.672629, 39.187979], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 102</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.667218, 39.181287], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 73</b><br>Клеймо: <b>АА</b><br>стена возле Дома Давидовича<br><i></i>');
+
+        L.circleMarker([51.679922, 39.186698], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 76</b><br>Клеймо: <b>Т.Г.ii</b><br>стена возле дома<br><i></i>');
+
+        L.circleMarker([51.671010, 39.184581], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 8</b><br>Клеймо: <b>Т.Г.i</b><br><br><i></i>');
+
+        L.circleMarker([51.665936, 39.179895], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 83</b><br>Клеймо: <b>ВК</b><br><br><i>Находка 2 (отдельная)</i>');
+
+        L.circleMarker([51.669409, 39.185713], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 83</b><br>Клеймо: <b>ВКЗН8</b><br><br><i></i>');
+
+        L.circleMarker([51.667682, 39.179823], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Свободы, 33</b><br>Клеймо: <b>Т.Г.i</b><br>здание прокуратуры<br><i>Дубль — уточнить, ранее был ТГ</i>');
+
+        L.circleMarker([51.665136, 39.186398], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Свободы, 33</b><br>Клеймо: <b>ТГ</b><br>здание прокуратуры<br><i></i>');
+
+        L.circleMarker([51.667663, 39.190787], {
+            color: 'indigo',
+            fillColor: 'indigo',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Свободы, 45</b><br>Клеймо: <b>АК</b><br>стена напротив дома (возможно, относится к домовладению №41)<br><i>Возможные варианты: Андрей Константинович Кузьмин (завод 1874, г. Задонск) или Анастасия Семеновна Колпачева</i>');
+
+        L.circleMarker([51.677754, 39.177434], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Смоленская</b><br>Клеймо: <b>ВК</b><br><br><i>Видна только одна буква, предположительно ВК</i>');
+
+        L.circleMarker([51.667808, 39.187004], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Смоленская, 25</b><br>Клеймо: <b>АА</b><br><br><i></i>');
+
+        L.circleMarker([51.667428, 39.178417], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Смоленская, 25</b><br>Клеймо: <b>ВК</b><br><br><i></i>');
+
+        L.circleMarker([51.678968, 39.185437], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ст. Разина, 51</b><br>Клеймо: <b>Т.Г.i</b><br><br><i></i>');
+
+        L.circleMarker([51.671563, 39.188854], {
+            color: 'cadetblue',
+            fillColor: 'cadetblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Студенческая</b><br>Клеймо: <b>ВСК</b><br>Дом \'Гармошка\' (фасад на ул. Студенческую)<br><i>Теперь оштукатурен</i>');
+
+        L.circleMarker([51.676920, 39.179347], {
+            color: 'darkblue',
+            fillColor: 'darkblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Студенческая, 31</b><br>Клеймо: <b>НК</b><br>пристройка к дворовому фасаду<br><i></i>');
+
+        L.circleMarker([51.665551, 39.183197], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Таранченко</b><br>Клеймо: <b>ВК</b><br>спуск ближе к Никольской церкви<br><i></i>');
+
+        L.circleMarker([51.670777, 39.183772], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Таранченко</b><br>Клеймо: <b>ВК</b><br>подпорная стена<br><i></i>');
+
+        L.circleMarker([51.675665, 39.187074], {
+            color: 'purple',
+            fillColor: 'purple',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Таранченко</b><br>Клеймо: <b>ВКЗН8</b><br>начало спуска<br><i>Также встречается на Батуринской 34 и Доме Вигеля</i>');
+
+        L.circleMarker([51.679747, 39.177875], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Театральная, 30</b><br>Клеймо: <b>ТГ</b><br><br><i></i>');
+
+        L.circleMarker([51.670442, 39.181729], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 1</b><br>Клеймо: <b>Г.С.Н.Х.</b><br>жилой дом<br><i>Нечетные дома 1,3 — более \'унылая\' архитектура</i>');
+
+        L.circleMarker([51.677787, 39.180279], {
+            color: 'darkred',
+            fillColor: 'darkred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 22</b><br>Клеймо: <b>ЯК</b><br><br><i></i>');
+
+        L.circleMarker([51.667043, 39.183478], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 3</b><br>Клеймо: <b>Г.С.Н.Х.</b><br>жилой дом<br><i>Нечетные дома 1,3 — более \'унылая\' архитектура</i>');
+
+        L.circleMarker([51.670750, 39.180757], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 4</b><br>Клеймо: <b>Т.Г.ii</b><br>жилой дом<br><i>Дома 4, 6 — более интересная архитектура. Ранее был Т.Г.i — уточнено на филиал №2</i>');
+
+        L.circleMarker([51.667997, 39.191072], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 52</b><br>Клеймо: <b>н/д</b><br>(со стороны ул. Среднемосковской)<br><i>Клеймо не указано</i>');
+
+        L.circleMarker([51.671090, 39.190082], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 6</b><br>Клеймо: <b>Т.Г.ii</b><br>жилой дом<br><i>Дома 4, 6 — более интересная архитектура. Ранее был Т.Г.i — уточнено на филиал №2</i>');
+
+        L.circleMarker([51.672805, 39.177109], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 91</b><br>Клеймо: <b>Т.Г.i</b><br>стена возле дома<br><i></i>');
+
+        L.circleMarker([51.679989, 39.189676], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 45</b><br>Клеймо: <b>АА</b><br><br><i>Возможно, другой шрифт (требует уточнения)</i>');
+
+        L.circleMarker([51.679504, 39.191122], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 49</b><br>Клеймо: <b>АА</b><br><br><i>Возможно, другой шрифт (требует уточнения)</i>');
+
+        L.circleMarker([51.677579, 39.178961], {
+            color: 'crimson',
+            fillColor: 'crimson',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ф. Энгельса, 53</b><br>Клеймо: <b>ФИК</b><br>стена возле Дома книготорговца Кашкина<br><i>Завод с 1875 года в Ямской слободе. С 1905 года сын Михаил Федорович Кожевников с клеймом МК</i>');
+
+        L.circleMarker([51.671770, 39.179720], {
+            color: 'navy',
+            fillColor: 'navy',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Цюрупы, 32</b><br>Клеймо: <b>ВКЗ</b><br>стена во дворе дома<br><i></i>');
+
+        L.circleMarker([51.670417, 39.177238], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Цюрупы, 34</b><br>Клеймо: <b>Т.Г.i</b><br><br><i></i>');
+
+        L.circleMarker([51.670064, 39.192065], {
+            color: 'orange',
+            fillColor: 'orange',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Цюрупы, 7</b><br>Клеймо: <b>ВК</b><br>стена возле дома<br><i></i>');
+
+        L.circleMarker([51.668243, 39.188845], {
+            color: 'red',
+            fillColor: 'red',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Швейников, 4</b><br>Клеймо: <b>АА</b><br>жилой дом Усадьбы Яковлева<br><i></i>');
+
+        L.circleMarker([51.671280, 39.183068], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Шевченко</b><br>Клеймо: <b>н/д</b><br><br><i>Клейма не указаны</i>');
+
+        L.circleMarker([51.679317, 39.192227], {
+            color: 'lightgray',
+            fillColor: 'lightgray',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Шевченко</b><br>Клеймо: <b>н/д</b><br>старая стена рядом со Спасским храмом<br><i>Интересные клейма, не расшифрованы</i>');
+
+        L.circleMarker([51.672892, 39.187795], {
+            color: 'blue',
+            fillColor: 'blue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. не указана, дом №14</b><br>Клеймо: <b>Т.Г.</b><br>во дворе<br><i>Улица не указана в тексте</i>');
+
+        L.circleMarker([51.666477, 39.181047], {
+            color: 'darkblue',
+            fillColor: 'darkblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. не указана, дом №14 (примыкающий)</b><br>Клеймо: <b>Н.К.</b><br><br><i>Старинное клеймо</i>');
+
+        L.circleMarker([51.678275, 39.177691], {
+            color: 'salmon',
+            fillColor: 'salmon',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>Воронеж (близ \'красного корпуса ВГУ\')</b><br>Клеймо: <b>ША?</b><br>раскоп<br><i>Требует уточнения</i>');
+
+        L.circleMarker([51.681000, 39.186000], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Кольцовская, 24 д</b><br>Клеймо: <b>Г.С.Н.Х.</b><br>Винзавод<br><i>Кирпичное клеймо советского периода</i>');
+
+        L.circleMarker([51.675000, 39.180000], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пушкинская, 1</b><br>Клеймо: <b>Г.С.Н.Х.</b><br>со двора<br><i>Кирпич с клеймом находится на большой высоте. На этом же адресе зафиксировано клеймо ТГ</i>');
+
+        L.circleMarker([51.667000, 39.187000], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 30</b><br>Клеймо: <b>Г.С.Н.Х.</b><br>со двора<br><i>Кирпичное клеймо советского периода</i>');
+
+        L.circleMarker([51.669000, 39.195000], {
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ворошилова, 15</b><br>Клеймо: <b>Г.С.Н.Х.</b><br><br><i>Кирпичное клеймо советского периода</i>');
+
+        L.circleMarker([51.667200, 39.187200], {
+            color: 'darkolivegreen',
+            fillColor: 'darkolivegreen',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 32</b><br>Клеймо: <b>З.Г.</b><br><br><i>Владелец неизвестен (варианты: завод Голиковой А.Ф., завод Гудкова В.В., завод "Глинозем")</i>');
+
+        L.circleMarker([51.674500, 39.175500], {
+            color: 'coral',
+            fillColor: 'coral',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Старинный, 1а</b><br>Клеймо: <b>ИА</b><br>внутренний двор<br><i>Возможно, Акимов И.И.</i>');
+
+        L.circleMarker([51.665600, 39.178000], {
+            color: 'sienna',
+            fillColor: 'sienna',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>ИГ</b><br>стена возле усадьбы Гарденина<br><i>Владелец клейма неизвестен</i>');
+
+        L.circleMarker([51.665700, 39.178100], {
+            color: 'mediumvioletred',
+            fillColor: 'mediumvioletred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>МА</b><br>строение в районе бывшей усадьбы Гарденина<br><i>Владелец клейма пока не установлен</i>');
+
+        L.circleMarker([51.676000, 39.185000], {
+            color: 'mediumvioletred',
+            fillColor: 'mediumvioletred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 19</b><br>Клеймо: <b>МА</b><br><br><i>Владелец клейма пока не установлен</i>');
+
+        L.circleMarker([51.667700, 39.190800], {
+            color: 'mediumvioletred',
+            fillColor: 'mediumvioletred',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Свободы, 45</b><br>Клеймо: <b>МА</b><br>стена напротив дома (возможно, стена принадлежит домовладению №41)<br><i>Владелец клейма пока не установлен. На этом же адресе зафиксировано клеймо АК</i>');
+
+        L.circleMarker([51.678100, 39.191500], {
+            color: 'darkkhaki',
+            fillColor: 'darkkhaki',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 69</b><br>Клеймо: <b>НД</b><br>внешняя стена бывшей усадьбы Глущенко<br><i>Кирпич с клеймом на внешней стороне стены. На этом же адресе зафиксировано клеймо АГ</i>');
+
+        L.circleMarker([51.665800, 39.178200], {
+            color: 'darkkhaki',
+            fillColor: 'darkkhaki',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>НД</b><br>стена бывшей усадьбы Гарденина<br><i>Владелец клейма пока неизвестен</i>');
+
+        L.circleMarker([51.667300, 39.186700], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Сакко и Ванцетти, 73</b><br>Клеймо: <b>Н.К.</b><br>стена возле дома<br><i>Возможно, Николай Петрович Кожевников. На этом же адресе зафиксировано клеймо АА</i>');
+
+        L.circleMarker([51.660000, 39.195000], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 9 января, 35</b><br>Клеймо: <b>Н.К.</b><br><br><i>Возможно, Николай Петрович Кожевников</i>');
+
+        L.circleMarker([51.676100, 39.185200], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 24</b><br>Клеймо: <b>Н.К.</b><br>"красный" корпус ВГУ<br><i>Возможно, Николай Петрович Кожевников. На этом же адресе зафиксированы клейма ВК, ИС, ФИК</i>');
+
+        L.circleMarker([51.676100, 39.185300], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 19</b><br>Клеймо: <b>Н.К.</b><br><br><i>Возможно, Николай Петрович Кожевников. На этом же адресе зафиксировано клеймо МА</i>');
+
+        L.circleMarker([51.677000, 39.176500], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Солдатский</b><br>Клеймо: <b>Н.К.</b><br>стена<br><i>Возможно, Николай Петрович Кожевников. На этом же адресе зафиксированы клейма ВК, Т.Г.i</i>');
+
+        L.circleMarker([51.670000, 39.175000], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Большая Стрелецкая, 63</b><br>Клеймо: <b>Н.К.</b><br><br><i>Возможно, Николай Петрович Кожевников</i>');
+
+        L.circleMarker([51.667100, 39.187100], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 34</b><br>Клеймо: <b>Н.К.</b><br>стена возле дома<br><i>Возможно, Николай Петрович Кожевников</i>');
+
+        L.circleMarker([51.665900, 39.178300], {
+            color: 'mediumslateblue',
+            fillColor: 'mediumslateblue',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный, 10</b><br>Клеймо: <b>Н.К.</b><br>стена возле дома<br><i>Возможно, Николай Петрович Кожевников. На этом же адресе зафиксированы клейма АГ, ИФТ, ИГ, МА, НД, н/д</i>');
+
+        L.circleMarker([51.668300, 39.186600], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Ленина, 86А/2</b><br>Клеймо: <b>Я.К.</b><br>Дача Вяхиревой<br><i>Яков Степанович Колпачев. На этом же адресе зафиксировано клеймо н/д</i>');
+
+        L.circleMarker([51.676150, 39.185250], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 24</b><br>Клеймо: <b>Я.К.</b><br>"красный" корпус ВГУ<br><i>Яков Степанович Колпачев. На этом же адресе зафиксированы клейма ВК, ИС, ФИК, Н.К.</i>');
+
+        L.circleMarker([51.677100, 39.176600], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Солдатский, 6</b><br>Клеймо: <b>Я.К.</b><br><br><i>Яков Степанович Колпачев</i>');
+
+        L.circleMarker([51.669500, 39.178900], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пер. Фабричный</b><br>Клеймо: <b>Я.К.</b><br>стена, примыкающая к Тихвино-Онуфриевскому храму<br><i>Яков Степанович Колпачев. На этом же адресе зафиксированы клейма АГ, ВК, ИФТ, ИГ, МА, НД, Н.К., н/д</i>');
+
+        L.circleMarker([51.676050, 39.185350], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>пр. Революции, 19</b><br>Клеймо: <b>Я.К.</b><br><br><i>Яков Степанович Колпачев. На этом же адресе зафиксированы клейма МА, Н.К.</i>');
+
+        L.circleMarker([51.667700, 39.190900], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Свободы, 45</b><br>Клеймо: <b>Я.К.</b><br>стена напротив дома (возможно, стена принадлежит домовладению №41)<br><i>Яков Степанович Колпачев. На этом же адресе зафиксированы клейма АК, МА</i>');
+
+        L.circleMarker([51.679900, 39.184500], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. 25 Октября, 22</b><br>Клеймо: <b>Я.К.</b><br><br><i>Яков Степанович Колпачев. На этом же адресе зафиксировано клеймо ВК</i>');
+
+        L.circleMarker([51.665500, 39.186400], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Пятницкого, 42</b><br>Клеймо: <b>Я.К.</b><br>главный дом усадьбы купца В.И. Халтурина<br><i>Яков Степанович Колпачев. На этом же адресе зафиксированы клейма ВК, ВСК, ЯК. Возможно, Я.К. и ЯК — одно и то же клеймо, требует уточнения</i>');
+
+        L.circleMarker([51.667100, 39.187000], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 30</b><br>Клеймо: <b>Я.К.</b><br>бывшая Печерская церковь<br><i>Яков Степанович Колпачев. На этом же адресе зафиксировано клеймо Г.С.Н.Х.</i>');
+
+        L.circleMarker([51.667200, 39.187200], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Рабочий городок, 32</b><br>Клеймо: <b>Я.К.</b><br>дом<br><i>Яков Степанович Колпачев. Кирпич с клеймом обнаружен на доме. На этом же адресе зафиксировано клеймо З.Г.</i>');
+
+        L.circleMarker([51.671700, 39.185200], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. С. Разина, 53А</b><br>Клеймо: <b>Я.К.</b><br>флигель во дворе бывшей усадьбы Вяхирева<br><i>Яков Степанович Колпачев. Кирпич с клеймом обнаружен на доме. На этом же адресе зафиксировано клеймо н/д</i>');
+
+        L.circleMarker([51.680000, 39.195000], {
+            color: 'tomato',
+            fillColor: 'tomato',
+            fillOpacity: 0.7,
+            radius: 8,
+            weight: 2
+        }).addTo(map).bindPopup('<b>ул. Целинная, 3</b><br>Клеймо: <b>Я.К.</b><br><br><i>Яков Степанович Колпачев</i>');
+
+        // МАКСИМАЛЬНАЯ ЗАЩИТА ОТ КОПИРОВАНИЯ
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        document.addEventListener('keydown', function(e) {
+            // Блокировка: F12, Ctrl+Shift+I/J, Ctrl+U, Ctrl+S, Ctrl+P, Ctrl+A, Ctrl+C, Ctrl+X, Ctrl+V
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+                (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P' || e.key === 'a' || e.key === 'A' || e.key === 'c' || e.key === 'C' || e.key === 'x' || e.key === 'X' || e.key === 'v' || e.key === 'V'))) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('cut', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('paste', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('mousedown', function(e) {
+            if (e.button === 2) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        // Запрет выделения двойным/тройным кликом
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        });
+        // Запрет долгого нажатия (мобильные)
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+    <div class="watermark"><a href="https://vk.com/vstopone" target="_blank">Группа ВКонтакте "В стороне от.."</a></div>
+    <div class="copyright-bar">© 2026 <a href="https://vk.com/vstopone" target="_blank">Группа ВКонтакте "В стороне от.."</a>. При использовании данных — ссылка на источник обязательна.</div>
+</body>
+</html>
