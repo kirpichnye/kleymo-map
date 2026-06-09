@@ -24,15 +24,15 @@
             display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
             z-index: 1000; max-height: 80px; overflow-y: auto;
         }
-        .legend-item { display: flex; align-items: center; gap: 3px; font-size: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; }
         .color-box { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #333; }
-        h2 { margin: 0 10px 0 0; font-size: 13px; }
-        .legend-group-link { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; margin: 0 6px; }
+        h2 { margin: 0 12px 0 0; font-size: 14px; }
+        .legend-group-link { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; margin: 0 8px; }
         .legend-group-link a { color: #2a5885; text-decoration: none; }
         .legend-group-link a:hover { text-decoration: underline; color: #1a3a6b; }
         .map-switch { margin-left: auto; padding: 6px 12px; background: #2a5885; color: white; border-radius: 4px; text-decoration: none; font-size: 12px; }
         .map-switch:hover { background: #1a3a6b; }
-        #map { height: calc(100vh - 80px); margin-top: 80px; }
+        #map { height: calc(100vh - 80px); margin-top: 0; }
         .watermark {
             position: fixed; bottom: 42px; right: 15px; z-index: 1001; opacity: 0.9;
             font-size: 15px; color: #222; background: rgba(255,255,255,0.95);
@@ -54,7 +54,7 @@
 </head>
 <body oncontextmenu="return false">
     <div id="legend">
-        <h2>Карта клейм на кирпичах Воронежа</h2>
+        <h2>Карта клейм на кирпичах</h2>
         <div class="legend-item"><div class="color-box" style="background:#ff0000"></div>АА</div>
         <div class="legend-item"><div class="color-box" style="background:#0066ff"></div>ТГ</div>
         <div class="legend-item"><div class="color-box" style="background:#00aa00"></div>ГСНХ</div>
@@ -254,7 +254,7 @@ var _m = [
                     hintContent: d.h,
                     balloonContent: d.b
                 }, {
-                    preset: 'islands#circleIcon',
+                    preset: 'islands#dotIcon',
                     iconColor: d.yc
                 });
                 map.geoObjects.add(placemark);
