@@ -10,7 +10,7 @@
     <link rel="canonical" href="https://vk.com/vstopone">
     <script src="https://api-maps.yandex.com/2.1/?lang=ru_RU&apikey=" type="text/javascript" id="ymap-script"></script>
     <style>
-        html, body, #map { width: 100%; height: calc(100vh - 80px - 32px); margin: 0; padding: 0; overflow: hidden; position: absolute; top: 80px; left: 0; }
+        html, body, #map { width: 100%; flex: 1; margin: 0; padding: 0; overflow: hidden; position: relative; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
@@ -18,11 +18,11 @@
         }
         img { -webkit-user-drag: none; pointer-events: none; }
         #legend {
-            position: fixed; top: 0; left: 0; right: 0;
             padding: 10px 12px; background: rgba(248,249,250,0.95);
             border-bottom: 2px solid #dee2e6;
             display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
             z-index: 1000; max-height: 80px; overflow-y: auto;
+            flex-shrink: 0;
         }
         .legend-item { display: flex; align-items: center; gap: 4px; font-size: 11px; }
         .color-box { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #333; }
@@ -34,7 +34,7 @@
         .map-switch:hover { background: #1a3a6b; }
         #map { height: calc(100vh - 80px); margin-top: 0; }
         .watermark {
-            position: fixed; bottom: 42px; right: 15px; z-index: 1001; opacity: 0.9;
+            position: absolute; bottom: 42px; right: 15px; z-index: 1001; opacity: 0.9;
             font-size: 15px; color: #222; background: rgba(255,255,255,0.95);
             padding: 10px 16px; border-radius: 6px; pointer-events: none; font-weight: 700;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.1);
@@ -42,10 +42,10 @@
         .watermark a { color: #2a5885; text-decoration: none; pointer-events: auto; font-size: 16px; }
         .watermark a:hover { text-decoration: underline; color: #1a3a6b; }
         .copyright-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
             background: rgba(30,30,30,0.92); color: #ccc; font-size: 12px;
             padding: 6px 15px; text-align: center; pointer-events: none;
             height: 32px; line-height: 20px; box-sizing: border-box;
+            flex-shrink: 0;
         }
         .copyright-bar a { color: #6a9fd4; text-decoration: none; pointer-events: auto; font-weight: 600; font-size: 13px; }
         .copyright-bar a:hover { text-decoration: underline; color: #8ab8e8; }
